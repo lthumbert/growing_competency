@@ -1,0 +1,345 @@
+{
+  "info": {
+    "name": "Sports Teams API",
+    "description": "API testing for my sports teams API. Server needs to be running at http://127.0.0.1:8000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - GET all teams",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"response is a JSON array\", function () {",
+              "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+              "});",
+              "",
+              "pm.test(\"there are at least 4 teams\", function () {",
+              "    var teams = pm.response.json();",
+              "    pm.expect(teams.length).to.be.at.least(4);",
+              "});",
+              "",
+              "pm.test(\"a team has all four fields\", function () {",
+              "    var team = pm.response.json()[0];",
+              "    pm.expect(team).to.have.property(\"id\");",
+              "    pm.expect(team).to.have.property(\"name\");",
+              "    pm.expect(team).to.have.property(\"city\");",
+              "    pm.expect(team).to.have.property(\"sport\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/teams",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams"]
+        }
+      }
+    },
+    {
+      "name": "2 - GET an existing team",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"returns the team I asked for\", function () {",
+              "    var team = pm.response.json();",
+              "    pm.expect(team.id).to.eql(2);",
+              "    pm.expect(team.name).to.eql(\"Diamondbacks\");",
+              "    pm.expect(team.city).to.eql(\"Phoenix\");",
+              "    pm.expect(team.sport).to.eql(\"Baseball\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/teams/2",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams", "2"]
+        }
+      }
+    },
+    {
+      "name": "3 - GET a team that does not exist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"error message is Team not found\", function () {",
+              "    pm.expect(pm.response.json().detail).to.eql(\"Team not found\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/teams/999",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams", "999"]
+        }
+      }
+    },
+    {
+      "name": "4 - POST a valid team",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"returns the team I sent\", function () {",
+              "    var team = pm.response.json();",
+              "    pm.expect(team.name).to.eql(\"Sounders\");",
+              "    pm.expect(team.city).to.eql(\"Seattle\");",
+              "    pm.expect(team.sport).to.eql(\"Soccer\");",
+              "});",
+              "",
+              "pm.test(\"the API assigned an id\", function () {",
+              "    var team = pm.response.json();",
+              "    pm.expect(team.id).to.be.a(\"number\");",
+              "    pm.collectionVariables.set(\"createdTeamId\", team.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Sounders\",\n    \"city\": \"Seattle\",\n    \"sport\": \"Soccer\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/teams",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams"]
+        }
+      }
+    },
+    {
+      "name": "5 - GET the team I just created",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"the team was actually saved\", function () {",
+              "    var team = pm.response.json();",
+              "    pm.expect(team.name).to.eql(\"Sounders\");",
+              "    pm.expect(team.id).to.eql(pm.collectionVariables.get(\"createdTeamId\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/teams/{{createdTeamId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams", "{{createdTeamId}}"]
+        }
+      }
+    },
+    {
+      "name": "6 - POST a team with missing fields",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 422\", function () {",
+              "    pm.response.to.have.status(422);",
+              "});",
+              "",
+              "pm.test(\"detail is a list of validation errors\", function () {",
+              "    pm.expect(pm.response.json().detail).to.be.an(\"array\");",
+              "});",
+              "",
+              "pm.test(\"city and sport are reported as missing\", function () {",
+              "    var fields = pm.response.json().detail.map(function (error) {",
+              "        return error.loc[error.loc.length - 1];",
+              "    });",
+              "    pm.expect(fields).to.include(\"city\");",
+              "    pm.expect(fields).to.include(\"sport\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Sharks\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/teams",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams"]
+        }
+      }
+    },
+    {
+      "name": "7 - POST a team with an empty name",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 422\", function () {",
+              "    pm.response.to.have.status(422);",
+              "});",
+              "",
+              "pm.test(\"the error is about the name field\", function () {",
+              "    var fields = pm.response.json().detail.map(function (error) {",
+              "        return error.loc[error.loc.length - 1];",
+              "    });",
+              "    pm.expect(fields).to.include(\"name\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"\",\n    \"city\": \"Denver\",\n    \"sport\": \"Hockey\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/teams",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams"]
+        }
+      }
+    },
+    {
+      "name": "8 - POST a team with the wrong data type",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status code is 422\", function () {",
+              "    pm.response.to.have.status(422);",
+              "});",
+              "",
+              "pm.test(\"the error is about the name field\", function () {",
+              "    var fields = pm.response.json().detail.map(function (error) {",
+              "        return error.loc[error.loc.length - 1];",
+              "    });",
+              "    pm.expect(fields).to.include(\"name\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": 123,\n    \"city\": \"Denver\",\n    \"sport\": \"Hockey\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/teams",
+          "host": ["{{baseUrl}}"],
+          "path": ["teams"]
+        }
+      }
+    }
+  ]
+}
