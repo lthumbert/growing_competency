@@ -29,6 +29,7 @@ This will run the automated tests
 Endpoints I implemented include 
 
 GET /teams
+
 GET /teams/{team_id}
 
 POST /teams
